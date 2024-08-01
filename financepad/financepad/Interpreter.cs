@@ -10,6 +10,7 @@ namespace financepad
     {
         public int result {  get; private set; }
         private readonly Dictionary<string, int> _variables = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _labels = new Dictionary<string, int>();
         public void Execute(Node program)
         {
             foreach (var child in program.children)
@@ -27,7 +28,7 @@ namespace financepad
             {
                 labelValue = executeOperationNode(labelValue, child);
             }
-            result = labelValue; 
+            result = labelValue;
         }
         private int executeOperationNode(int parentValue, Node operationNode)
         {
