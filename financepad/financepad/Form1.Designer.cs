@@ -30,6 +30,7 @@
         {
             richTextBox1 = new RichTextBox();
             textBox1 = new TextBox();
+            button1 = new Button();
             SuspendLayout();
             // 
             // richTextBox1
@@ -51,15 +52,27 @@
             textBox1.Size = new Size(377, 138);
             textBox1.TabIndex = 1;
             // 
+            // button1
+            // 
+            button1.Location = new Point(383, 250);
+            button1.Name = "button1";
+            button1.Size = new Size(125, 44);
+            button1.TabIndex = 2;
+            button1.Text = "Run";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += Form1_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(577, 454);
+            Controls.Add(button1);
             Controls.Add(textBox1);
             Controls.Add(richTextBox1);
             Name = "Form1";
             Text = "Form1";
+            Click += Form1_Click;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -68,5 +81,6 @@
 
         private RichTextBox richTextBox1;
         private TextBox textBox1;
+        private Button button1;
     }
 }

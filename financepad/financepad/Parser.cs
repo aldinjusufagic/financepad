@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace financepad
     }
     public class Parser
     {
-        public static Node Parse(List<Token> tokens)
+        public Node Parse(List<Token> tokens)
         {
             var root = new Node() { type = "Program" };
             int index = 0;
@@ -31,34 +32,42 @@ namespace financepad
                     root.children.Add(labelNode);
                     index++;
 
-                    if (tokens[index].type == "Operator")
+                    while (index < tokens.Count && tokens[index].type == "Operator")
                     {
                         var operationNode = new Node
                         {
-                            type = "Label",
+                            type = "Operator",
                             value = tokens[index].lexeme
                         };
-                        labelNode.children.Add(operationNode);
-                        if (tokens[index].type == "Number")
+                        index++;
+                        
+                        if (index < tokens.Count && tokens[index].type == "Number")
                         {
                             var numberNode = new Node
                             {
                                 type = "Number",
                                 value = tokens[index].lexeme
                             };
+
                             operationNode.children.Add(numberNode);
+                            Debug.WriteLine($"Added child: {tokens[index].lexeme} to {operationNode}");
                             index++;
                         }
-                        if (tokens[index].type == "Identifier")
+
+                        if (index < tokens.Count && tokens[index].type == "Identifier")
                         {
                             var identifierNode = new Node
                             {
                                 type = "Identifier",
                                 value = tokens[index].lexeme
                             };
+
                             operationNode.children.Add(identifierNode);
+                            Debug.WriteLine($"Added child: {tokens[index].lexeme} to {operationNode}");
                             index++;
                         }
+
+                        labelNode.children.Add(operationNode);
                     }
                 }
                 else
