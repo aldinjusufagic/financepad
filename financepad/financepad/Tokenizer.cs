@@ -20,6 +20,7 @@ namespace financepad
 
         private static readonly Regex OperatorPattern = new Regex(@"^([+-])\s*(\d+)?\s*\((\w*)\)$", RegexOptions.Compiled);
         private static readonly Regex LabelPattern = new Regex(@"^(\w+)(?:\s\((\w+)\))?:$", RegexOptions.Compiled);
+        private static readonly Regex VariableDeclarationPattern = new Regex(@"^(\d+)?\s*\((\w*)\)", RegexOptions.Compiled);
         public List<Token> Tokenize(string text)
         {
             var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -46,6 +47,17 @@ namespace financepad
                         tokens.Add(new Token { type = "Number", lexeme = operatorMatch.Groups[2].Value });
                     if (operatorMatch.Groups[3].Success)
                         tokens.Add(new Token { type = "Identifier", lexeme = operatorMatch.Groups[3].Value });
+                    continue;
+                }
+
+                var VariableMatch = VariableDeclarationPattern.Match(line);
+                if (VariableMatch.Success)
+                {
+                    Debug.WriteLine($"{VariableMatch.Groups[1].Value} {VariableMatch.Groups[2].Value}");
+                    if (VariableMatch.Groups[1].Success)
+                        tokens.Add(new Token { type = "Number", lexeme = VariableMatch.Groups[1].Value });
+                    if (VariableMatch.Groups[2].Success)
+                        tokens.Add(new Token { type = "Identifier", lexeme = VariableMatch.Groups[2].Value });
                     continue;
                 }
             }

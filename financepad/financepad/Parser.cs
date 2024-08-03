@@ -79,6 +79,27 @@ namespace financepad
                         labelNode.children.Add(operationNode);
                     }
                 }
+                else if (tokens[index].type == "Number")
+                {
+                    var numberNode = new Node
+                    {
+                        type = "Number",
+                        value = tokens[index].lexeme
+                    };
+                    root.children.Add(numberNode);
+                    index++;
+                    if (index < tokens.Count && tokens[index].type == "Identifier")
+                    {
+                        var identifierNode = new Node
+                        {
+                            type = "Identifier",
+                            value = tokens[index].lexeme
+                        };
+                        numberNode.children.Add(identifierNode);
+                        index++;
+                    }
+
+                }
                 else
                     index++;
             }

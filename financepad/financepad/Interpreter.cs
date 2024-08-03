@@ -21,7 +21,21 @@ namespace financepad
                     _labels[child.value] = 0;
                     executeLabelNode(child);
                 }
+                else if (child.type == "Number")
+                {
+                    executeNumberNode(child);
+                }
             }
+        }
+        private void executeNumberNode(Node numberNode)
+        {
+            if (numberNode.children.Count == 1 && numberNode.children[0].type == "Identifier")
+            {
+                string variableName = numberNode.children[0].value;
+                _variables[variableName] = int.Parse(numberNode.value);
+            }
+            else
+                throw new InvalidOperationException("Variable declaration is incorrect");
         }
         private void executeLabelNode(Node labelNode)
         {
