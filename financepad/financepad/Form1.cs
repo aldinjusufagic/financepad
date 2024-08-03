@@ -28,27 +28,23 @@ namespace financepad
 
         private void Form1_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine("button clicked");
             runProgram(richTextBox1.Text);
         }
         private void runProgram(string text)
-        {
-            Debug.WriteLine("running program");
-
-            Debug.WriteLine("getting tokens");
+        { 
             var tokenizer = new Tokenizer();
             var tokens = tokenizer.Tokenize(text);
 
-            Debug.Write("parsing");
             var parser = new Parser();
             var syntaxTree = parser.Parse(tokens);
 
-            Debug.WriteLine("interperating");
             var interpreter = new Interpreter();
             interpreter.Execute(syntaxTree);
 
-            Debug.WriteLine($"program result: {interpreter.result}");
-            textBox1.Text = interpreter.result.ToString();
+            foreach (var pair in interpreter._labels)
+            {
+                textBox1.AppendText($"{pair.Key}: {pair.Value}\r\n");
+            }
         }
     }
 }

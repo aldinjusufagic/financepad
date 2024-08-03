@@ -21,7 +21,6 @@ namespace financepad
             int index = 0;
             while (index < tokens.Count)
             {
-
                 if (tokens[index].type == "Label")
                 {
                     var labelNode = new Node
@@ -31,6 +30,18 @@ namespace financepad
                     };
                     root.children.Add(labelNode);
                     index++;
+
+                    if (index < tokens.Count && tokens[index].type == "Modifier")
+                    {
+                        var modifierNode = new Node
+                        {
+                            type = "Modifier",
+                            value = tokens[index].lexeme
+                        };
+
+                        labelNode.children.Add(modifierNode);
+                        index++;
+                    }
 
                     while (index < tokens.Count && tokens[index].type == "Operator")
                     {
@@ -50,7 +61,6 @@ namespace financepad
                             };
 
                             operationNode.children.Add(numberNode);
-                            Debug.WriteLine($"Added child: {tokens[index].lexeme} to {operationNode}");
                             index++;
                         }
 
@@ -63,7 +73,6 @@ namespace financepad
                             };
 
                             operationNode.children.Add(identifierNode);
-                            Debug.WriteLine($"Added child: {tokens[index].lexeme} to {operationNode}");
                             index++;
                         }
 

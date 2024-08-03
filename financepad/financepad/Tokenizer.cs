@@ -18,8 +18,8 @@ namespace financepad
         //@"^([+-])\s*(\d+)\s*\((\w*)\)$"
         //@"^(\w*):$"
 
-        private static readonly Regex OperatorPattern = new Regex(@"^([+-])\s*(\d+)\s*\((\w*)\)$", RegexOptions.Compiled);
-        private static readonly Regex LabelPattern = new Regex(@"^(\w*):$", RegexOptions.Compiled);
+        private static readonly Regex OperatorPattern = new Regex(@"^([+-])\s*(\d+)?\s*\((\w*)\)$", RegexOptions.Compiled);
+        private static readonly Regex LabelPattern = new Regex(@"^(\w+)(?:\s\((\w+)\))?:$", RegexOptions.Compiled);
         public List<Token> Tokenize(string text)
         {
             var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -32,6 +32,8 @@ namespace financepad
                 {
                     if (labelMatch.Groups[1].Success)
                         tokens.Add(new Token { type = "Label", lexeme = labelMatch.Groups[1].Value });
+                    if (labelMatch.Groups[2].Success)
+                        tokens.Add(new Token { type = "Modifier", lexeme = labelMatch.Groups[2].Value });
                     continue;
                 }
 
@@ -47,10 +49,6 @@ namespace financepad
                     continue;
                 }
             }
-            //for (int i = 0; i < tokens.Count; i++)
-            //{
-            //    Debug.WriteLine(tokens[i].lexeme, tokens[i].type);
-            //}
             return tokens;
         }
     }
