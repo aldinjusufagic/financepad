@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,41 +44,7 @@ namespace financepad
                         index++;
                     }
 
-                    while (index < tokens.Count && tokens[index].type == "Operator")
-                    {
-                        var operationNode = new Node
-                        {
-                            type = "Operator",
-                            value = tokens[index].lexeme
-                        };
-                        index++;
-                        
-                        if (index < tokens.Count && tokens[index].type == "Number")
-                        {
-                            var numberNode = new Node
-                            {
-                                type = "Number",
-                                value = tokens[index].lexeme
-                            };
-
-                            operationNode.children.Add(numberNode);
-                            index++;
-                        }
-
-                        if (index < tokens.Count && tokens[index].type == "Identifier")
-                        {
-                            var identifierNode = new Node
-                            {
-                                type = "Identifier",
-                                value = tokens[index].lexeme
-                            };
-
-                            operationNode.children.Add(identifierNode);
-                            index++;
-                        }
-
-                        labelNode.children.Add(operationNode);
-                    }
+                    addChildOperatorNode(ref index, tokens, labelNode);
                 }
                 else if (tokens[index].type == "Number")
                 {
@@ -88,22 +55,73 @@ namespace financepad
                     };
                     root.children.Add(numberNode);
                     index++;
-                    if (index < tokens.Count && tokens[index].type == "Identifier")
+                    if (index < tokens.Count && tokens[index].type == "Variable")
                     {
-                        var identifierNode = new Node
+                        var variableNode = new Node
                         {
-                            type = "Identifier",
+                            type = "Variable",
                             value = tokens[index].lexeme
                         };
-                        numberNode.children.Add(identifierNode);
+                        numberNode.children.Add(variableNode);
                         index++;
                     }
-
+                }
+                else if (tokens[index].type == "Keyword")
+                {
+                    if (tokens[index].lexeme == "Template")
+                    {
+                        var templateNode = new Node
+                        {
+                            type = "Keyword",
+                            value = tokens[index].lexeme
+                        };
+                        root.children.Add(templateNode);
+                        index++;
+                        addChildOperatorNode(ref index, tokens, templateNode);
+                    }
                 }
                 else
                     index++;
             }
             return root;
+        }
+        private void addChildOperatorNode(ref int index, List<Token> tokens, Node parentNode)
+        {
+            while (index < tokens.Count && tokens[index].type == "Operator")
+            {
+                var operationNode = new Node
+                {
+                    type = "Operator",
+                    value = tokens[index].lexeme
+                };
+                index++;
+
+                if (index < tokens.Count && tokens[index].type == "Number")
+                {
+                    var numberNode = new Node
+                    {
+                        type = "Number",
+                        value = tokens[index].lexeme
+                    };
+
+                    operationNode.children.Add(numberNode);
+                    index++;
+                }
+
+                if (index < tokens.Count && tokens[index].type == "Variable")
+                {
+                    var variableNode = new Node
+                    {
+                        type = "Variable",
+                        value = tokens[index].lexeme
+                    };
+
+                    operationNode.children.Add(variableNode);
+                    index++;
+                }
+
+                parentNode.children.Add(operationNode);
+            }
         }
     }
 }

@@ -12,6 +12,8 @@ namespace financepad
         public int result {  get; private set; }
         private readonly Dictionary<string, int> _variables = new Dictionary<string, int>();
         public readonly Dictionary<string, int> _labels = new Dictionary<string, int>();
+        private int _templateValue = 0;
+        private bool _hasTemplate = false;
         public void Execute(Node program)
         {
             foreach (var child in program.children)
@@ -25,11 +27,33 @@ namespace financepad
                 {
                     executeNumberNode(child);
                 }
+                else if (child.type == "Keyword")
+                {
+                    getKeyword(child);
+                }
+            }
+        }
+        private void getKeyword(Node keyword)
+        {
+            if (keyword.value == "Template")
+            {
+                _hasTemplate = true;
+                executeTemplateNode(keyword);
+            }
+        }
+        private void executeTemplateNode(Node templateNode) 
+        {
+            int templateValue = 0;
+            foreach (var child in templateNode.children)
+            {
+                if (child.type == "Operator")
+                    templateValue = executeOperationNode(templateValue, child);
+                _templateValue = templateValue;
             }
         }
         private void executeNumberNode(Node numberNode)
         {
-            if (numberNode.children.Count == 1 && numberNode.children[0].type == "Identifier")
+            if (numberNode.children.Count == 1 && numberNode.children[0].type == "Variable")
             {
                 string variableName = numberNode.children[0].value;
                 _variables[variableName] = int.Parse(numberNode.value);
@@ -39,11 +63,17 @@ namespace financepad
         }
         private void executeLabelNode(Node labelNode)
         {
-            int labelValue = 0;
+            int labelValue;
+            if (_hasTemplate)
+                labelValue = _templateValue;
+            else
+                labelValue = 0;
+
+            Debug.WriteLine(labelValue);
             foreach (var child in labelNode.children)
             {
                 if (child.type == "Operator")
-                    labelValue = executeOperationNode(_labels[labelNode.value], child);
+                    labelValue = executeOperationNode(labelValue, child);
 
                 if (child.type == "Modifier")
                 {
@@ -54,8 +84,8 @@ namespace financepad
                     else
                         throw new ArgumentException($"Modifier {child.value} does not exist");
                 }
-                _labels[labelNode.value] = labelValue;
             }
+            _labels[labelNode.value] = labelValue;
         }
         private int executeOperationNode(int parentValue, Node operationNode)
         {
@@ -63,7 +93,7 @@ namespace financepad
 
             if (operationNode.children.Count == 2)
             {
-                if (operationNode.children[0].type == "Number" && operationNode.children[1].type == "Identifier")
+                if (operationNode.children[0].type == "Number" && operationNode.children[1].type == "Variable")
                 {
                     int numberValue = int.Parse(operationNode.children[0].value);
                     string variableName = operationNode.children[1].value;
@@ -80,7 +110,7 @@ namespace financepad
             else if (operationNode.children.Count == 1)
             {
                 Node child = operationNode.children[0];
-                if (child.type == "Identifier")
+                if (child.type == "Variable")
                 {
                     if (_variables.ContainsKey(child.value))
                     {
@@ -91,8 +121,6 @@ namespace financepad
                 }
                 else
                     throw new InvalidOperationException($"Argument must be of type: Identifier");
-
-                return parentValue;
             }
             else
                 throw new ArgumentNullException("Operation must have at least one Argument");
@@ -101,7 +129,6 @@ namespace financepad
         }
         private int calculateOperation(string type, int labelValue, int childValue)
         {
-            Debug.WriteLine($"{labelValue} {childValue}");
             if (type == "+")
             {
                 labelValue += childValue;

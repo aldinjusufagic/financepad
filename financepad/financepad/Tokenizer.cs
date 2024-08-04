@@ -21,6 +21,7 @@ namespace financepad
         private static readonly Regex OperatorPattern = new Regex(@"^([+-])\s*(\d+)?\s*\((\w*)\)$", RegexOptions.Compiled);
         private static readonly Regex LabelPattern = new Regex(@"^(\w+)(?:\s\((\w+)\))?:$", RegexOptions.Compiled);
         private static readonly Regex VariableDeclarationPattern = new Regex(@"^(\d+)?\s*\((\w*)\)", RegexOptions.Compiled);
+        public string[] keywords = { "Template" };
         public List<Token> Tokenize(string text)
         {
             var lines = text.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -29,12 +30,24 @@ namespace financepad
             foreach (var line in lines)
             {
                 var labelMatch = LabelPattern.Match(line);
+                bool isKeyword = false;
                 if (labelMatch.Success)
                 {
-                    if (labelMatch.Groups[1].Success)
-                        tokens.Add(new Token { type = "Label", lexeme = labelMatch.Groups[1].Value });
-                    if (labelMatch.Groups[2].Success)
-                        tokens.Add(new Token { type = "Modifier", lexeme = labelMatch.Groups[2].Value });
+                    for (int i = 0; i < keywords.Length; i++)
+                    {
+                        if (labelMatch.Groups[1].Value == keywords[i])
+                        {
+                            tokens.Add(new Token { type = "Keyword", lexeme = labelMatch.Groups[1].Value });
+                            isKeyword = true;
+                        }
+                    }
+                    if (!isKeyword)
+                    {
+                        if (labelMatch.Groups[1].Success)
+                            tokens.Add(new Token { type = "Label", lexeme = labelMatch.Groups[1].Value });
+                        if (labelMatch.Groups[2].Success)
+                            tokens.Add(new Token { type = "Modifier", lexeme = labelMatch.Groups[2].Value });
+                    }
                     continue;
                 }
 
@@ -46,18 +59,17 @@ namespace financepad
                     if (operatorMatch.Groups[2].Success)
                         tokens.Add(new Token { type = "Number", lexeme = operatorMatch.Groups[2].Value });
                     if (operatorMatch.Groups[3].Success)
-                        tokens.Add(new Token { type = "Identifier", lexeme = operatorMatch.Groups[3].Value });
+                        tokens.Add(new Token { type = "Variable", lexeme = operatorMatch.Groups[3].Value });
                     continue;
                 }
 
                 var VariableMatch = VariableDeclarationPattern.Match(line);
                 if (VariableMatch.Success)
                 {
-                    Debug.WriteLine($"{VariableMatch.Groups[1].Value} {VariableMatch.Groups[2].Value}");
                     if (VariableMatch.Groups[1].Success)
                         tokens.Add(new Token { type = "Number", lexeme = VariableMatch.Groups[1].Value });
                     if (VariableMatch.Groups[2].Success)
-                        tokens.Add(new Token { type = "Identifier", lexeme = VariableMatch.Groups[2].Value });
+                        tokens.Add(new Token { type = "Variable", lexeme = VariableMatch.Groups[2].Value });
                     continue;
                 }
             }
