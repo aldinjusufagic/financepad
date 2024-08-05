@@ -4,7 +4,7 @@ About:
 Notepad but for calculating home finances or smth. A text editor integrated with a badly coded "scripting language".
 
 The "scripting language" content:
--Label
+- Label
   A block of code with a starting value of 0 (if not modified).
   syntax:
     labelName: -create a label.
@@ -23,7 +23,7 @@ The "scripting language" content:
   used to multiply a variable x amount of times inside a label.
   syntax:
     {(variableName)} *{amount}
--Template keyword
+- Template keyword
   used to create a block of code that will be applied to all labels automatically.
   syntax:
   Template:
