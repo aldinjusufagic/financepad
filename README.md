@@ -22,7 +22,7 @@ Notepad but for calculating home finances or smth. A richTextBox with a badly co
   - used to add or remove from a labels value.
   - syntax:
   	```
-		+{value} {(variableName)} -all values are stored as a variable.
+	+{value} {(variableName)} -all values are stored as a variable.
 	```
    	```
    	+{variableName} -if variable created outside label.
