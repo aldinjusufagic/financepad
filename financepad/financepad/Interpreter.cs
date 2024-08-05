@@ -89,10 +89,10 @@ namespace financepad
         }
         private int executeOperationNode(int parentValue, Node operationNode)
         {
-            string operatorValue = operationNode.value;
-
+            string operatorType = operationNode.value;
             if (operationNode.children.Count == 2)
             {
+                Debug.WriteLine(operationNode.children[0].value, operationNode.children[1].value);
                 if (operationNode.children[0].type == "Number" && operationNode.children[1].type == "Variable")
                 {
                     int numberValue = int.Parse(operationNode.children[0].value);
@@ -100,7 +100,23 @@ namespace financepad
 
                     _variables[variableName] = numberValue;
 
-                    parentValue = calculateOperation(operatorValue, parentValue, numberValue);
+                    parentValue = calculateOperation(operatorType, parentValue, numberValue);
+                }
+                else if (operationNode.children[0].type == "Variable" && operationNode.children[1].type == "Multiply")
+                {
+                    if (_variables.ContainsKey(operationNode.children[0].value))
+                    {
+                        Debug.WriteLine("variable exists");
+                        int variableValue = _variables[operationNode.children[0].value];
+                        if (operationNode.children[1].value == "*")
+                        {
+                            Debug.WriteLine("doing multiplication");
+                            int amountToMultiply = int.Parse(operationNode.children[1].children[0].value);
+                            Debug.WriteLine(amountToMultiply);
+                            variableValue = variableValue * amountToMultiply;
+                            parentValue = calculateOperation(operatorType, parentValue, variableValue);
+                        }
+                    }  
                 }
                 else
                 {
@@ -113,17 +129,15 @@ namespace financepad
                 if (child.type == "Variable")
                 {
                     if (_variables.ContainsKey(child.value))
-                    {
-                        parentValue = calculateOperation(operatorValue, parentValue, _variables[child.value]);
-                    }
+                        parentValue = calculateOperation(operatorType, parentValue, _variables[child.value]);
                     else
-                        throw new ArgumentException("Identifier does not exist");
+                        throw new ArgumentException("Variable does not exist");
                 }
                 else
-                    throw new InvalidOperationException($"Argument must be of type: Identifier");
+                    throw new InvalidOperationException($"Argument must be of type: Variable");
             }
             else
-                throw new ArgumentNullException("Operation must have at least one Argument");
+                throw new ArgumentException("Operation arguments out of range");
 
             return parentValue;
         }

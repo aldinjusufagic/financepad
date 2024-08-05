@@ -120,6 +120,28 @@ namespace financepad
                     index++;
                 }
 
+                if (index < tokens.Count && tokens[index].type == "Multiply")
+                {
+                    var multiplyNode = new Node
+                    {
+                        type = "Multiply",
+                        value = tokens[index].lexeme
+                    };
+
+                    operationNode.children.Add(multiplyNode);
+                    index++;
+                    if (index < tokens.Count && tokens[index].type == "Number")
+                    {
+                        var numberNode = new Node
+                        {
+                            type = "Number",
+                            value = tokens[index].lexeme
+                        };
+
+                        multiplyNode.children.Add(numberNode);
+                        index++;
+                    }
+                }
                 parentNode.children.Add(operationNode);
             }
         }

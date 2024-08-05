@@ -15,12 +15,13 @@ namespace financepad
     }
     public class Tokenizer
     {
-        //@"^([+-])\s*(\d+)\s*\((\w*)\)$"
+        //@"^([+-])\s*(\d+)?\s*\((\w*)\)$"
         //@"^(\w*):$"
 
-        private static readonly Regex OperatorPattern = new Regex(@"^([+-])\s*(\d+)?\s*\((\w*)\)$", RegexOptions.Compiled);
+        private static readonly Regex OperatorPattern = new Regex(@"^([+-])\s*(\d+)?\s*\((\w*)\)(?:\s*(\*)(\d+))?$", RegexOptions.Compiled);
         private static readonly Regex LabelPattern = new Regex(@"^(\w+)(?:\s\((\w+)\))?:$", RegexOptions.Compiled);
         private static readonly Regex VariableDeclarationPattern = new Regex(@"^(\d+)?\s*\((\w*)\)", RegexOptions.Compiled);
+
         public string[] keywords = { "Template" };
         public List<Token> Tokenize(string text)
         {
@@ -60,6 +61,10 @@ namespace financepad
                         tokens.Add(new Token { type = "Number", lexeme = operatorMatch.Groups[2].Value });
                     if (operatorMatch.Groups[3].Success)
                         tokens.Add(new Token { type = "Variable", lexeme = operatorMatch.Groups[3].Value });
+                    if (operatorMatch.Groups[4].Success)
+                        tokens.Add(new Token { type = "Multiply", lexeme = operatorMatch.Groups[4].Value });
+                    if (operatorMatch.Groups[5].Success)
+                        tokens.Add(new Token { type = "Number", lexeme = operatorMatch.Groups[5].Value });
                     continue;
                 }
 
